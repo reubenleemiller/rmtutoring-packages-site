@@ -50,7 +50,7 @@ async function handleSubmit(e) {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "https://packages.rmtutoringservices.com/success",
+        return_url: "https://packages.rmtutoringservices.com/pages/success",
       },
     });
 
