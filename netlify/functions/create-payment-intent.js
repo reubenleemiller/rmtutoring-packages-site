@@ -1,25 +1,24 @@
-// netlify/functions/create-payment-intent.js
-const fetch = require('node-fetch');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const PRICES = {
-  "4hr": 16000,  // $160.00 CAD
-  "8hr": 32000,  // $320.00 CAD
-  "12hr": 48000  // $480.00 CAD
+  "4hr": 16000,
+  "8hr": 32000,
+  "12hr": 48000,
 };
 
 exports.handler = async (event) => {
+  const { package } = JSON.parse(event.body);
+
+  const amount = PRICES[package];
+
+  if (!amount) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid package selected" }),
+    };
+  }
+
   try {
-    const { package } = JSON.parse(event.body);
-    const amount = PRICES[package];
-
-    if (!amount) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Invalid package selected" }),
-      };
-    }
-
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "cad",
