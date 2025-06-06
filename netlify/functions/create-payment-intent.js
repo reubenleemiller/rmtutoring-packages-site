@@ -1,29 +1,30 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const PRICES = {
-  "4hr": "price_1RWsHNFkTAUuP5b8o8vv8tBP",    // Replace with your real Stripe Price IDs
-  "8hr": "price_8HOUR",
-  "12hr": "price_12HOUR"
-};
-
 exports.handler = async (event) => {
-  const { package } = JSON.parse(event.body);
-  const priceId = PRICES[package];
-
-  if (!priceId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid package selected" }),
-    };
-  }
-
   try {
+    const { package } = JSON.parse(event.body);
+
+    // Log inputs and environment (optional for debugging)
+    console.log("Selected package:", package);
+    console.log("Using Stripe Key Prefix:", process.env.STRIPE_SECRET_KEY?.slice(0, 8));
+
+    const PACKAGE_AMOUNTS = {
+      "4hr": 16000,   // in cents = $160.00 CAD
+      "8hr": 32000,
+      "12hr": 48000,
+    };
+
+    const amount = PACKAGE_AMOUNTS[package];
+
+    if (!amount) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid package selected" }),
+      };
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: {
-        "4hr": 16000,
-        "8hr": 32000,
-        "12hr": 48000
-      }[package],
+      amount,
       currency: "cad",
       automatic_payment_methods: { enabled: true },
     });
@@ -33,6 +34,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (err) {
+    console.error("Stripe Error:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),

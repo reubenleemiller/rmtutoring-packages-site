@@ -1,26 +1,45 @@
 // scripts/client.js
 
-const stripe = Stripe("pk_test_51QyjAMFkTAUuP5b82jYSwMC96AclTfz6Ey02T8nWYXILZrLf1TeWosP42yPAh5tIvcvmadj2bN6T4JwNYiFK1WfS00DmubNBSn"); // Replace with your real publishable key
+// Replace with your real Stripe publishable key
+const stripe = Stripe("pk_test_51QyjAMFkTAUuP5b82jYSwMC96AclTfz6Ey02T8nWYXILZrLf1TeWosP42yPAh5tIvcvmadj2bN6T4JwNYiFK1WfS00DmubNBSn");
 
 let elements;
-initialize();
 
-document
-  .querySelector("#payment-form")
-  .addEventListener("submit", handleSubmit);
+document.addEventListener("DOMContentLoaded", () => {
+  initialize();
+
+  const form = document.querySelector("#payment-form");
+  if (form) {
+    form.addEventListener("submit", handleSubmit);
+  }
+
+  const packageSelector = document.querySelector("#package");
+  if (packageSelector) {
+    packageSelector.addEventListener("change", initialize);
+  }
+});
 
 async function initialize() {
   const packageValue = document.querySelector("#package").value;
 
   const response = await fetch("/.netlify/functions/create-payment-intent", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ package: packageValue }),
   });
 
+  if (!response.ok) {
+    const { error } = await response.json();
+    document.querySelector("#error-message").textContent = error || "Failed to load payment info.";
+    return;
+  }
+
   const { clientSecret } = await response.json();
+
+  if (!clientSecret) {
+    document.querySelector("#error-message").textContent = "Missing client secret.";
+    return;
+  }
 
   elements = stripe.elements({ clientSecret });
 
