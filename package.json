@@ -2,6 +2,23 @@
   "name": "rmtutoring-site",
   "version": "1.0.0",
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
+    "node-fetch": "^3.3.2",
+    "stripe": "^18.2.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reubenleemiller/rmtutoring-packages-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reubenleemiller/rmtutoring-packages-site/issues"
+  },
+  "homepage": "https://github.com/reubenleemiller/rmtutoring-packages-site#readme",
+  "description": ""
 }
