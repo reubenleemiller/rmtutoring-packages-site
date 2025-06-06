@@ -1,43 +1,46 @@
-let stripe, elements;
-let selectedPackage = '4hr';
+// scripts/client.js
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const packageSelector = document.getElementById("package");
+const stripe = Stripe("pk_test_51QyjAMFkTAUuP5b82jYSwMC96AclTfz6Ey02T8nWYXILZrLf1TeWosP42yPAh5tIvcvmadj2bN6T4JwNYiFK1WfS00DmubNBSn"); // Replace with your real publishable key
 
-  async function initializePaymentForm(pkg) {
-    const res = await fetch("/.netlify/functions/create-payment-intent", {
-      method: "POST",
-      body: JSON.stringify({ package: pkg }),
-    });
+let elements;
+initialize();
 
-    const { clientSecret, publishableKey } = await res.json();
+document
+  .querySelector("#payment-form")
+  .addEventListener("submit", handleSubmit);
 
-    stripe = Stripe(publishableKey);
-    elements = stripe.elements({ clientSecret });
+async function initialize() {
+  const packageValue = document.querySelector("#package").value;
 
-    const paymentElement = elements.create("payment");
-    document.getElementById("payment-element").innerHTML = ""; // clear previous
-    paymentElement.mount("#payment-element");
+  const response = await fetch("/.netlify/functions/create-payment-intent", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ package: packageValue }),
+  });
+
+  const { clientSecret } = await response.json();
+
+  elements = stripe.elements({ clientSecret });
+
+  const paymentElement = elements.create("payment");
+  paymentElement.mount("#payment-element");
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  document.querySelector("#submit").disabled = true;
+
+  const { error } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: "https://packages.rmtutoringservices.com/success",
+    },
+  });
+
+  if (error) {
+    document.querySelector("#error-message").textContent = error.message;
+    document.querySelector("#submit").disabled = false;
   }
-
-  await initializePaymentForm(selectedPackage);
-
-  packageSelector.addEventListener("change", async (e) => {
-    selectedPackage = e.target.value;
-    await initializePaymentForm(selectedPackage);
-  });
-
-  document.getElementById("payment-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: "https://packages.rmtutoringservices.com/success",
-      },
-    });
-
-    if (error) {
-      document.getElementById("error-message").textContent = error.message;
-    }
-  });
-});
+}
