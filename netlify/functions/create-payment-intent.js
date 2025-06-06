@@ -1,20 +1,17 @@
+// netlify/functions/create-payment-intent.js
+const fetch = require('node-fetch');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+const PRICES = {
+  "4hr": 16000,  // $160.00 CAD
+  "8hr": 32000,  // $320.00 CAD
+  "12hr": 48000  // $480.00 CAD
+};
 
 exports.handler = async (event) => {
   try {
     const { package } = JSON.parse(event.body);
-
-    // Log inputs and environment (optional for debugging)
-    console.log("Selected package:", package);
-    console.log("Using Stripe Key Prefix:", process.env.STRIPE_SECRET_KEY?.slice(0, 8));
-
-    const PACKAGE_AMOUNTS = {
-      "4hr": 16000,   // in cents = $160.00 CAD
-      "8hr": 32000,
-      "12hr": 48000,
-    };
-
-    const amount = PACKAGE_AMOUNTS[package];
+    const amount = PRICES[package];
 
     if (!amount) {
       return {
@@ -34,7 +31,6 @@ exports.handler = async (event) => {
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (err) {
-    console.error("Stripe Error:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
