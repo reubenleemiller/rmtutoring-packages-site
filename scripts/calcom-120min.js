@@ -7,4 +7,4 @@ Cal("init", "120min", {origin:"https://cal.com"});
   // data-cal-namespace="120min"
   // `data-cal-config='{"layout":"month_view"}'`
 
-  Cal.ns["120min"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+  Cal.ns["120min"]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#27163E"}},"hideEventTypeDetails":false,"layout":"month_view"});
