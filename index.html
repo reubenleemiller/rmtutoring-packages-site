@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" class="preloader-lock">
+<head>
+<script>
+  document.documentElement.classList.add('preloader-lock');
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Package Options</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body class="locked">
+<div id="site-preloader" class="">
+  <div class="preloader-spinner-wrapper">
+    <div class="custom-spinner">
+      <div></div>
+    </div>
+    <img src="assets/logo.png" alt="RM Tutoring Services Logo" class="preloader-logo" />
+  </div>
+</div>
+  <header>
+    <a href="https://rmtutoringservices.com/index"><img src="assets/logo.png" alt="RM Tutoring Logo" class="logo" /></a>
+    <button class="hamburger" onclick="toggleMenu()" data-ignore-preloader>☰</button>
+    <nav id="nav-menu" class="nav">
+      <ul>
+        <li><a href="https://rmtutoringservices.com/index">Home</a></li>
+        <li><a href="https://scheduling.rmtutoringservices.com">Scheduling</a></li>
+        <li><a href="https://packages.rmtutoringservices.com">Packages</a></li>
+        <li><a href="https://rmtutoringservices.com/pages/about">About</a></li>
+        <li><a href="https://rmtutoringservices.com/pages/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+<main class="content">
+  <h2>Select a Tutoring Package</h2>
+
+  <div class="carousel-container">
+    <button class="carousel-arrow left" aria-label="Scroll Left">&#10094;</button>
+    
+    <div class="pricing-carousel"> 
+    <div class="carousel-spacer"></div>
+    <div class="pricing-cards">       	
+        <!-- 4 Hour Package -->
+        <div class="pricing-card" data-package="4hr" data-amount="16000">
+          <h3>4 Hours</h3>
+          <p>$160 CAD</p>
+          <label class="subscribe-label">
+            <input type="checkbox" name="subscribe" />
+            Subscribe monthly
+          </label>
+          <button type="button" class="select-btn">
+            <span class="select-label">Select</span>
+            <span class="checkmark-wrapper">
+              <svg class="checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark-check" fill="none" d="M14 27l7 7 17-17" />
+              </svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- 8 Hour Package (Recommended + Selected by default) -->
+        <div class="pricing-card recommended selected" data-package="8hr" data-amount="32000">
+          <div class="ribbon">Recommended</div>
+          <h3>8 Hours</h3>
+          <p>$320 CAD</p>
+          <label class="subscribe-label">
+            <input type="checkbox" name="subscribe" />
+            Subscribe monthly
+          </label>
+          <button type="button" class="select-btn">
+            <span class="select-label">Select</span>
+            <span class="checkmark-wrapper">
+              <svg class="checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark-check" fill="none" d="M14 27l7 7 17-17" />
+              </svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- 12 Hour Package -->
+        <div class="pricing-card" data-package="12hr" data-amount="48000">
+          <h3>12 Hours</h3>
+          <p>$480 CAD</p>
+          <label class="subscribe-label">
+            <input type="checkbox" name="subscribe" />
+            Subscribe monthly
+          </label>
+          <button type="button" class="select-btn">
+            <span class="select-label">Select</span>
+            <span class="checkmark-wrapper">
+              <svg class="checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark-check" fill="none" d="M14 27l7 7 17-17" />
+              </svg>
+            </span>
+          </button>
+        </div>      
+    </div> <!-- .pricing-cards --> 
+    <div class="carousel-spacer"></div>      
+    </div> <!-- .pricing-carousel -->
+
+    <button class="carousel-arrow right" aria-label="Scroll Right">&#10095;</button>
+    <div class="carousel-dots" id="carousel-dots"></div>
+  </div> <!-- .carousel-container -->
+
+  <button id="submit">Continue to Payment</button>
+  <div id="error-message"></div>
+</main>
+
+<footer class="footer-flex">
+<div class="footer-links">
+<p>© 2025 RM Tutoring Services.</p>
+<a href="https://rmtutoringservices.com/index">Home</a>
+<a href="https://rmtutoringservices.com/pages/about">About</a>
+<a href="https://rmtutoringservices.com/pages/terms-of-service">Terms of Service</a>
+<a href="https://rmtutoringservices.com/pages/privacy-policy">Privacy Policy</a>
+<a href="https://rmtutoringservices.com/pages/refund-policy">Refund Policy</a>
+<a href="https://rmtutoringservices.com/pages/contact">Contact</a>
+<div class="footer-payment-icons">
+  <i class="fab fa-cc-visa"></i>
+  <i class="fab fa-cc-mastercard"></i>
+  <i class="fab fa-cc-stripe"></i>
+</div>
+</div>
+<div class="footer-links">
+<p>Sessions, Packages and Subscriptions</p>
+<a class="calcom-button" data-cal-link="rleemiller/60min" data-cal-namespace="60min" data-cal-config='{"layout":"month_view"}'>60-min Sessions</a>
+<a class="calcom-button" data-cal-link="rleemiller/90min" data-cal-namespace="90min" data-cal-config='{"layout":"month_view"}'>90-min Sessions</a>
+<a class="calcom-button" data-cal-link="rleemiller/120min" data-cal-namespace="120min" data-cal-config='{"layout":"month_view"}'>120-min Sessions</a>
+<a href="https://packages.rmtutoringservices.com/">Packages</a>
+<a href="https://pay.rmtutoringservices.com/p/login/fZubJ10rje8h7KO1Tt9sk00">Manage Subscription</a>
+</div>
+<div class="footer-contact-form">
+    <h3>Send Us a Message</h3>
+    <form id="contact-form" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="contact" />
+      <input type="hidden" name="bot-field" />
+
+      <input name="name" placeholder="Your Name" required type="text" />
+      <input name="email" placeholder="Your Email" required type="email" />
+      <textarea name="message" placeholder="Your Message" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+</div>
+</footer>
+<script src="scripts/preloader.js"></script>
+<script src="scripts/client.js"></script>
+<script src="scripts/calcom-60min.js"></script>
+<script src="scripts/calcom-90min.js"></script>
+<script src="scripts/calcom-120min.js"></script>
+<script src="scripts/contact-form.js"></script>
+<script src="scripts/chatwoot.js"></script>
+<script>
+  function toggleMenu() {
+    const nav = document.getElementById("nav-menu");
+    nav.classList.toggle("open");
+  }
+</script>
+</body>
+</html>
