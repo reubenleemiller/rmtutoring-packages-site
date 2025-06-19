@@ -1,5 +1,6 @@
-const stripe = Stripe("pk_test_51QyjAMFkTAUuP5b82jYSwMC96AclTfz6Ey02T8nWYXILZrLf1TeWosP42yPAh5tIvcvmadj2bN6T4JwNYiFK1WfS00DmubNBSn");
+const stripe = Stripe("pk_test_51QyjAMFkTAUuP5b82jYSwMC96AclTfz6Ey02T8nWYXILZrLf1TeWosP42yPAh5tIvcvmadj2bN6T4JwNYiFK1WfS00DmubNBSn"); // Use test key for dev
 let elements;
+let clientSecret;
 
 document.addEventListener("DOMContentLoaded", () => {
   const unlockCheckInterval = setInterval(() => {
@@ -19,58 +20,59 @@ async function initStripeCheckout() {
     return;
   }
 
-  // ✅ Get user inputs
-  const firstNameInput = document.getElementById("first-name");
-  const lastNameInput = document.getElementById("last-name");
-  const emailInput = document.getElementById("email");
+  // ✅ Wait until user enters email & name, then submit
+  const form = document.querySelector("#payment-form");
 
-  if (!firstNameInput || !lastNameInput || !emailInput) {
-    console.error("Name and email inputs are missing in the HTML.");
-    return;
-  }
+  // ✅ Submit handler
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    document.querySelector("#submit").disabled = true;
 
-  const customerFirstName = firstNameInput.value.trim();
-  const customerLastName = lastNameInput.value.trim();
-  const customerName = `${customerFirstName} ${customerLastName}`;
-  const customerEmail = emailInput.value.trim();
+    const firstName = document.getElementById("first-name")?.value.trim() || "";
+    const lastName = document.getElementById("last-name")?.value.trim() || "";
+    const customerEmail = document.getElementById("email")?.value.trim() || "";
+    const customerName = `${firstName} ${lastName}`.trim();
 
-  try {
-    // ✅ Send to backend with full name and email
-    const response = await fetch("/.netlify/functions/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        package: packageValue,
-        customerEmail,
-        customerName
-      })
-    });
+    try {
+      // ✅ Only create PaymentIntent once
+      if (!clientSecret) {
+        const response = await fetch("/.netlify/functions/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            package: packageValue,
+            customerEmail,
+            customerName
+          })
+        });
 
-    const { clientSecret } = await response.json();
+        const json = await response.json();
+        clientSecret = json.clientSecret;
 
-    if (!clientSecret || !clientSecret.startsWith("pi_")) {
-      throw new Error("Invalid clientSecret returned from server.");
-    }
-
-    // ✅ Mount Stripe Payment Element with prefilled billing details
-    elements = stripe.elements({
-      clientSecret,
-      defaultValues: {
-        billingDetails: {
-          name: customerName,
-          email: customerEmail
+        if (!clientSecret || !clientSecret.startsWith("pi_")) {
+          throw new Error("Invalid clientSecret returned from server.");
         }
+
+        // ✅ Mount only once after receiving clientSecret
+        elements = stripe.elements({
+          clientSecret,
+          defaultValues: {
+            billingDetails: {
+              name: customerName,
+              email: customerEmail
+            }
+          }
+        });
+
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
+
+        // ⚠️ Stop here and let user enter card info
+        document.querySelector("#submit").disabled = false;
+        return;
       }
-    });
 
-    const paymentElement = elements.create("payment");
-    paymentElement.mount("#payment-element");
-
-    const form = document.querySelector("#payment-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      document.querySelector("#submit").disabled = true;
-
+      // ✅ Now confirm payment
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -82,10 +84,11 @@ async function initStripeCheckout() {
         document.querySelector("#error-message").textContent = error.message;
         document.querySelector("#submit").disabled = false;
       }
-    });
 
-  } catch (err) {
-    console.error(err);
-    document.querySelector("#error-message").textContent = `Error: ${err.message}`;
-  }
+    } catch (err) {
+      console.error(err);
+      document.querySelector("#error-message").textContent = `Error: ${err.message}`;
+      document.querySelector("#submit").disabled = false;
+    }
+  });
 }
