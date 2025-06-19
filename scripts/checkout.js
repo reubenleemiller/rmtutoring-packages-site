@@ -2,7 +2,6 @@ const stripe = Stripe("pk_live_51QyjAMFkTAUuP5b8POjVyVCKi0ry2R54UQz4nZaTyWJYSSYP
 let elements;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Wait for preloader to finish and body to unlock
   const unlockCheckInterval = setInterval(() => {
     if (document.body.classList.contains("unlocked")) {
       clearInterval(unlockCheckInterval);
@@ -10,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 });
-console.log("Stripe initialized with package:", packageValue);
+
 async function initStripeCheckout() {
   const params = new URLSearchParams(window.location.search);
   const packageValue = params.get("package");
@@ -19,28 +18,22 @@ async function initStripeCheckout() {
     document.querySelector("#error-message").textContent = "No package selected.";
     return;
   }
-  
-  // Create elements with blank billing fields so Stripe will show them
-  elements = stripe.elements({
-    clientSecret: "", // placeholder until we fetch it
-    defaultValues: {
-      billingDetails: {
-        name: '',
-        email: ''
-      }
-    }
-  });
 
   try {
+    // ✅ Fetch clientSecret from backend
     const response = await fetch("/.netlify/functions/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ package: packageValue }),
+      body: JSON.stringify({ package: packageValue })
     });
 
     const { clientSecret } = await response.json();
-    
-    // Reinitialize with real clientSecret
+
+    if (!clientSecret || !clientSecret.startsWith("pi_")) {
+      throw new Error("Invalid clientSecret returned from server.");
+    }
+
+    // ✅ Initialize Stripe Elements only after receiving clientSecret
     elements = stripe.elements({
       clientSecret,
       defaultValues: {
@@ -54,16 +47,17 @@ async function initStripeCheckout() {
     const paymentElement = elements.create("payment");
     paymentElement.mount("#payment-element");
 
+    // ✅ Handle form submission
     const form = document.querySelector("#payment-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       document.querySelector("#submit").disabled = true;
 
-      const { error, paymentIntent } = await stripe.confirmPayment({
+      const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: "https://packages.rmtutoringservices.com/pages/success",
-        },
+        }
       });
 
       if (error) {
@@ -73,6 +67,7 @@ async function initStripeCheckout() {
     });
 
   } catch (err) {
+    console.error(err);
     document.querySelector("#error-message").textContent = `Error: ${err.message}`;
   }
 }
