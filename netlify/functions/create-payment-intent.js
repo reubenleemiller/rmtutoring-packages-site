@@ -29,7 +29,6 @@ exports.handler = async (event) => {
       }
     };
 
-    // ✅ Only set receipt_email if provided
     if (customerEmail) {
       paymentIntentData.receipt_email = customerEmail;
     }

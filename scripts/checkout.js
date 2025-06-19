@@ -19,20 +19,23 @@ async function initStripeCheckout() {
     return;
   }
 
-  // ✅ Get user inputs for name and email
-  const nameInput = document.getElementById("name");
+  // ✅ Get user inputs
+  const firstNameInput = document.getElementById("first-name");
+  const lastNameInput = document.getElementById("last-name");
   const emailInput = document.getElementById("email");
 
-  if (!nameInput || !emailInput) {
+  if (!firstNameInput || !lastNameInput || !emailInput) {
     console.error("Name and email inputs are missing in the HTML.");
     return;
   }
 
-  const customerName = nameInput.value || "";
-  const customerEmail = emailInput.value || "";
+  const customerFirstName = firstNameInput.value.trim();
+  const customerLastName = lastNameInput.value.trim();
+  const customerName = `${customerFirstName} ${customerLastName}`;
+  const customerEmail = emailInput.value.trim();
 
   try {
-    // ✅ Fetch clientSecret from backend, sending name/email
+    // ✅ Send to backend with full name and email
     const response = await fetch("/.netlify/functions/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,6 +52,7 @@ async function initStripeCheckout() {
       throw new Error("Invalid clientSecret returned from server.");
     }
 
+    // ✅ Mount Stripe Payment Element with prefilled billing details
     elements = stripe.elements({
       clientSecret,
       defaultValues: {
