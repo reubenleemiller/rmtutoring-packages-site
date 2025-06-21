@@ -32,7 +32,7 @@ const form = document.getElementById("contact-form");
 
       if (result.success) {
         // 3. Redirect only after both succeed
-        window.location.href = "/pages/thankyou.html";
+        window.location.href = "https://www.rmtutoringservices.com/pages/thankyou.html";
       } else {
         alert("❌ Error sending ticket.");
       }
