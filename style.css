@@ -151,7 +151,7 @@ a.button:hover {
   color: white;
 }
 .booking-buttons {
-  display: flex;
+  display: block;
   gap: 0.5rem;
 }
 footer {
