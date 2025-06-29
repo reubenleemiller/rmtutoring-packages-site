@@ -151,9 +151,29 @@ a.button:hover {
   color: white;
 }
 .booking-buttons {
-  display: block;
-  gap: 0.5rem;
+  display: flex;             /* Use flexbox for layout */
+  flex-wrap: wrap;           /* Allow wrapping on small screens */
+  gap: 0.5rem;               /* Spacing between buttons */
+  justify-content: center;  /* Center them within the .content box */
+  margin-top: 1rem;          /* Add spacing from elements above */
 }
+
+.booking-buttons button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1 1 auto;            /* Optional: allow flexible button widths */
+  max-width: 100%;           /* Prevent overflow */
+}
+
+.booking-buttons button:hover {
+  background-color: #0056b3;
+}
+
 footer {
   text-align: center;
   padding: 1rem;
