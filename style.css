@@ -126,7 +126,6 @@ button {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.4s ease;
-  margin: 0.5rem;
 }
 
 button:hover {
@@ -151,8 +150,10 @@ a.button:hover {
   transform: translateY(-2px) scale(1.03);
   color: white;
 }
-
-
+.booking-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
 footer {
   text-align: center;
   padding: 1rem;
